@@ -1,0 +1,131 @@
+%% CDC 核心域实体类图（GitHub 原生渲染）
+%% 分析建模产物：13 个实体类（含 2 个关联类），属性 — 关联 — 多重性
+%% 说明：类图用领域类型（String / Date / Decimal），SQL 具体类型见 ERD
+classDiagram
+    direction LR
+
+    class Center {
+        -CenterID : String
+        -CenterName : String
+        -Address : String
+        -Phone : String
+        -Email : String
+        -DirectorName : String
+        +统计诊室() int
+        +查询资源() List
+    }
+    class Room {
+        -CenterID : String
+        -RoomNo : String
+        -SeatCount : int
+        +查询可用时段() List
+        +检查冲突() Boolean
+    }
+    class Resource {
+        -ResourceID : String
+        -ResourceName : String
+        -PurchaseDate : Date
+        -Remark : String
+        +登记资源() void
+        +变更所属() void
+    }
+    class Patient {
+        -PatientID : String
+        -FullName : String
+        -MailingAddress : String
+        -Phone : String
+        -Email : String
+        -BirthDate : Date
+        -DiagnosisDate : Date
+        -DiabetesType : String
+        +登记患者() void
+        +查询历史读数() List
+    }
+    class CDE {
+        -CDEID : String
+        -Name : String
+        -StaffNo : String
+        -HireDate : Date
+        -WorkPhone : String
+        -HomePhone : String
+        -WorkEmail : String
+        -MobilePhone : String
+        +维护资质() void
+        +接诊预约() void
+    }
+    class Qualification {
+        -QualID : String
+        -QualName : String
+        +授予() void
+        +撤销() void
+    }
+    class CDE_Qualification {
+        -CDEID : String
+        -QualID : String
+        +校验资质有效性() Boolean
+    }
+    class Appointment {
+        -ApptID : String
+        -ApptDate : Date
+        -ApptTime : Time
+        -Status : String
+        -ClinicalNote : String
+        +创建预约() void
+        +变更状态() void
+    }
+    class Complication {
+        -CompID : String
+        -CompName : String
+        +分类() String
+        +统计发病率() Decimal
+    }
+    class Patient_Complication {
+        -PatientID : String
+        -CompID : String
+        -OnsetDate : Date
+        -Remark : String
+        +记录发病() void
+        +更新备注() void
+    }
+    class BloodGlucose {
+        -ReadingID : String
+        -TestDateTime : DateTime
+        -GlucoseValue : Decimal
+        -Remark : String
+        +校验唯一性() Boolean
+        +判定异常() Boolean
+    }
+    class Injection {
+        -InjectionID : String
+        -InjType : String
+        -Units : int
+        -InjTime : DateTime
+        +关联读数() void
+        +计算总量() int
+    }
+    class Nutrition {
+        -NutriID : String
+        -NutriDate : Date
+        -MealCount : int
+        -TotalCalorie : int
+        -FatRatio : Decimal
+        -ProteinRatio : Decimal
+        -CarbRatio : Decimal
+        +计算比例合计() Decimal
+        +校验完整性() Boolean
+    }
+
+    Center "1" *-- "1..*" Room : 包含
+    Center "1" --> "1..*" Resource : 拥有
+    Room "1" *-- "1..*" Resource : 配置
+    CDE "1" --> "1..*" CDE_Qualification : 持有
+    Qualification "1" --> "1..*" CDE_Qualification : 被授予
+    Patient "1" --> "1..*" Patient_Complication : 罹患
+    Complication "1" --> "1..*" Patient_Complication : 记录
+    Patient "1" --> "1..*" Appointment : 预约
+    CDE "1" --> "1..*" Appointment : 接诊
+    Center "1" --> "1..*" Appointment : 承办
+    Room "1" --> "1..*" Appointment : 使用
+    Patient "1" --> "1..*" BloodGlucose : 测量
+    Patient "1" --> "1..*" Nutrition : 记录
+    BloodGlucose "1" --> "0..1" Injection : 对应

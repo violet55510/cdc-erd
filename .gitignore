@@ -1,0 +1,13 @@
+# 依赖与产物
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 临时渲染中间件
+diagrams/_*.html
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini

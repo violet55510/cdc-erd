@@ -1,0 +1,112 @@
+%% CDC 集中数据库 · ERD（GitHub 原生渲染）
+%% 由「核心域类图」按「类→表、属性→列、关联→外键、多对多→关联表」映射而来
+erDiagram
+    CENTER ||--o{ ROOM : "包含"
+    CENTER ||--o{ RESOURCE : "拥有"
+    ROOM ||--o{ RESOURCE : "配置"
+    CDE ||--o{ CDE_QUALIFICATION : "持有"
+    QUALIFICATION ||--o{ CDE_QUALIFICATION : "被授予"
+    PATIENT ||--o{ PATIENT_COMPLICATION : "罹患"
+    COMPLICATION ||--o{ PATIENT_COMPLICATION : "记录"
+    PATIENT ||--o{ APPOINTMENT : "预约"
+    CDE ||--o{ APPOINTMENT : "接诊"
+    CENTER ||--o{ APPOINTMENT : "承办"
+    ROOM ||--o{ APPOINTMENT : "使用"
+    PATIENT ||--o{ BLOODGLUCOSE : "测量"
+    PATIENT ||--o{ NUTRITION : "记录"
+    BLOODGLUCOSE ||--o| INJECTION : "对应"
+
+    CENTER {
+        char CenterID PK "中心编号 CHAR(4)"
+        varchar CenterName "中心名称"
+        varchar Address "邮寄地址"
+        varchar Phone "联系电话"
+        varchar Email "电子邮箱"
+        varchar DirectorName "中心主任"
+    }
+    ROOM {
+        char CenterID PK, FK "所属中心 CHAR(4)"
+        char RoomNo PK "房间编号 CHAR(4)"
+        int SeatCount "座位数"
+    }
+    RESOURCE {
+        char ResourceID PK "资源标签编号 CHAR(10)"
+        varchar ResourceName "资源名称"
+        date PurchaseDate "购置日期"
+        varchar Remark "备注"
+        char CenterID FK "所属中心"
+        char RoomNo FK "所属诊室"
+    }
+    PATIENT {
+        char PatientID PK "患者编号 CHAR(8)"
+        varchar FullName "全名"
+        varchar MailingAddress "邮寄地址"
+        varchar Phone "电话"
+        varchar Email "电子邮箱（可空）"
+        date BirthDate "出生日期"
+        date DiagnosisDate "确诊日期"
+        varchar DiabetesType "糖尿病类型"
+    }
+    CDE {
+        char CDEID PK "CDE 编号 CHAR(8)"
+        varchar Name "姓名"
+        char StaffNo UK "9 位员工编号"
+        date HireDate "入职日期"
+        varchar WorkPhone "工作电话"
+        varchar HomePhone "家庭电话"
+        varchar WorkEmail "工作邮箱"
+        varchar MobilePhone "手机（可空）"
+    }
+    QUALIFICATION {
+        char QualID PK "资质编号 CHAR(4)"
+        varchar QualName "资质名称"
+    }
+    CDE_QUALIFICATION {
+        char CDEID PK, FK "CDE 编号"
+        char QualID PK, FK "资质编号"
+    }
+    APPOINTMENT {
+        char ApptID PK "预约编号 CHAR(10)"
+        char PatientID FK "患者"
+        char CDEID FK "接诊 CDE"
+        char CenterID FK "中心"
+        char RoomNo FK "诊室"
+        date ApptDate "预约日期"
+        time ApptTime "预约时间"
+        varchar Status "到诊/改期/取消"
+        varchar ClinicalNote "临床记录"
+    }
+    COMPLICATION {
+        char CompID PK "并发症编号 CHAR(4)"
+        varchar CompName "并发症名称"
+    }
+    PATIENT_COMPLICATION {
+        char PatientID PK, FK "患者"
+        char CompID PK, FK "并发症"
+        date OnsetDate "发病日期"
+        varchar Remark "备注"
+    }
+    BLOODGLUCOSE {
+        char ReadingID PK "读数编号 CHAR(12)"
+        char PatientID FK "患者"
+        datetime TestDateTime UK "检测日期时间"
+        decimal GlucoseValue "血糖值 mmol/L"
+        varchar Remark "异常值原因"
+    }
+    INJECTION {
+        char InjectionID PK "注射编号 CHAR(12)"
+        char ReadingID FK, UK "对应血糖读数"
+        varchar InjType "餐时/基础"
+        int Units "单位数"
+        datetime InjTime "注射时间"
+    }
+    NUTRITION {
+        char NutriID PK "记录编号 CHAR(12)"
+        char PatientID FK "患者"
+        date NutriDate "记录日期"
+        int MealCount "进餐次数"
+        int TotalCalorie "总热量 kcal"
+        decimal FatRatio "脂肪比例 %"
+        decimal ProteinRatio "蛋白质比例 %"
+        decimal CarbRatio "碳水比例 %"
+    }
